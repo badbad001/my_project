@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--扫描包扫描除了controller和controllerAdive的-->
+    <context:component-scan base-package="cn.itcast.ssm">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+
+    <!--引入jdbc的四大参数配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--druid连接池-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.user}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!--配制sqlsessionFactoryBean-->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 传入PageHelper的插件 -->
+        <property name="plugins">
+            <array>
+                <!-- 传入插件的对象 -->
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <props>
+                            <!--这个代表是哪个数据库连接选择相适应的方法-->
+                            <prop key="helperDialect">mysql</prop>
+                            <!--这个导致不会越届，即不会负页，和不会查询大于总页数的-->
+                            <prop key="reasonable">true</prop>
+                        </props>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <!--配制扫描的包，来创建mapper的代理对象,所以就不用在mapper上面加注解-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cn.itcast.ssm.mapper"/>
+    </bean>
+
+    <!--配制平台事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--开启注解事务-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--开启注解驱动-->
+    <aop:aspectj-autoproxy/>
+
+    <!--<aop:config>
+        <aop:pointcut id="ponitCut1" expression="execution(* cn.itcast.ssm.controller.*.*(..))"/>
+
+        <aop:aspect ref="logAop">
+            <aop:before method="doBefore" pointcut-ref="ponitCut1"></aop:before>
+            <aop:after method="doAfter" pointcut-ref="ponitCut1"></aop:after>
+        </aop:aspect>
+    </aop:config>
+-->
+</beans>
