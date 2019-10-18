@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.bus.mapper.SalesbackMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.itcast.bus.pojo.Salesback">
+        <id column="id" property="id" />
+        <result column="customerid" property="customerid" />
+        <result column="paytype" property="paytype" />
+        <result column="salesbacktime" property="salesbacktime" />
+        <result column="salebackprice" property="salebackprice" />
+        <result column="operateperson" property="operateperson" />
+        <result column="number" property="number" />
+        <result column="remark" property="remark" />
+        <result column="goodsid" property="goodsid" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, customerid, paytype, salesbacktime, salebackprice, operateperson, number, remark, goodsid
+    </sql>
+
+</mapper>

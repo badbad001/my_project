@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+       xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+   >
+<head>
+    <meta charset="UTF-8">
+    <title>公告管理</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css">
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+
+   
+
+</head>
+
+<body class="childrenBody">
+<!--条件查询start-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>公告查询</legend>
+</fieldset>
+
+<!--条件查询表单-->
+<form class="layui-form" action="" lay-filter="searchFrom" id="searchForm">
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">公告标题:</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="title"  autocomplete="off" class="layui-input">
+            </div>
+            <label class="layui-form-label">开始时间:</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="startTime" id="startTime"  autocomplete="off" class="layui-input">
+            </div>
+            <label class="layui-form-label">结束时间:</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="endTime" id="endTime" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">公告内容:</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="content"  autocomplete="off" class="layui-input">
+            </div>
+            <label class="layui-form-label">公告发布人:</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="opername"  autocomplete="off" class="layui-input">
+            </div>
+
+           <!-- 隔开的 -->
+            <div style="display: inline-block;width: 20px"></div>
+            
+            <button type="button" class="layui-btn layui-btn-normal" lay-filter="demo1" id="doSearch">查询</button>
+            <button type="reset" class="layui-btn layui-btn-warm">重置</button>
+
+        </div>
+    </div>
+
+</form>
+
+<!--添加和提交的框start-->
+<div style="display: none;padding: 20px" id="saveOrUpdateDiv" >
+    <form class="layui-form"  lay-filter="dataForm" id="dataForm">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">公告标题:</label>
+            <div class="layui-input-block">
+
+                <input type="hidden" name="id" id="id">
+                <input type="text" name="title"  placeholder="请输入标题" autocomplete="off"
+                       class="layui-input" >
+            </div>
+        </div>
+        
+        <!--富文本-->
+        <div class="layui-form-item">
+            <label class="layui-form-label">公告内容:</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea layui-hide" name="content"
+                           id="LAY_demo_editor"></textarea>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item" style="text-align: center;">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-release" lay-filter="doSubmit" lay-submit="">提交</button>
+                <button type="reset" id="layEditResetBtn" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--添加和提交的框end-->
+<!--表格渲染的-->
+<table class="layui-hide" id="dataTable" lay-filter="noticeTable"></table>
+<!--定义表头按钮，不显示-->
+<div class="layui-btn-container" style="display: none" id="toolbarDemo">
+     <!-- 这里加个shiro的判断，有这个权限才可以看到添加公告按钮 -->
+    <button class="layui-btn layui-btn-sm" lay-event="add" shiro:hasPermission="notice:create">添加</button>
+    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="deleteBatch">批量删除</button>
+</div>
+<!--右边的按钮-->
+<div style="display: none" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="view">查看公告</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</div>
+
+<!--查看公告-->
+<div style="display: none;" id="viewDiv">
+    <h2 id="view_title" align="center"></h2>
+    <hr>
+    <div style="text-align: right">
+        发布人:<span id="view_opername"></span>  <span style="display: inline-block;width: 20px"></span>
+        发布时间:<span id="view_createtime"></span>
+    </div>
+    <hr>
+    <div id="view_content"></div>
+</div>
+
+<!--layui的js-->
+<script src="/resources/layui/layui.js"></script>
+<script>
+    var tableIns;
+    var menuTree;
+// {/}的意思即代表采用自有路径，即不跟随 base 路径
+    layui.extend({
+        dtree: '/resources/layui_ext/dtree/dtree'   
+    }).use(['table','layer','jquery','element','laydate','form','layedit'], function(){
+        var $ = layui.jquery;
+        var form = layui.form;
+        var table = layui.table;
+        var dtree = layui.dtree;
+        var layer = layui.layer;
+        var layedit = layui.layedit;
+        var laydate = layui.laydate;
+        
+
+
+        //渲染时间
+        laydate.render({
+            elem:'#startTime',
+            type:'datetime'
+        });
+        laydate.render({
+            elem:'#endTime',
+            type:'datetime'
+        });
+
+        tableIns=table.render({
+            elem: '#dataTable'
+            ,url:'/notice/queryAllNotice'
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+            ,height:'full-180'
+            ,limit:5
+            ,limits:[5,7,10]
+            ,loading:true
+            // ,totalRow:true
+            ,title: '公告数据表'
+            ,cols: [
+            	[
+                {type: 'checkbox', fixed: 'left',align:'center'}
+                ,{field:'id', title:'ID',width:100,align:'center'}
+                ,{field:'title', title:'公告标题',align:'center'}
+                ,{field:'content', title:'公告内容',align:'center'}
+                ,{field:'createtime', title:'公告时间',align:'center'}
+                ,{field:'opername', title:'公告发布人',align:'center'}
+
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200,align:'center' }
+            ] ]
+            ,page: true
+           //处理删除某一页最后一条数据的BUG
+           //删除当前页数据，如果当前页条数为0，就返回上一页
+            ,done: function(res, curr, count){ 
+		        if(res.data.length==0&&curr!=1){
+		        	tableIns.reload({
+		        		page:{
+		        			curr:(curr-1)
+		        		}
+		        	});
+		        }
+		    }
+           
+        });
+
+
+        var title = '';
+        var url = '';
+        var saveOrUpdateLayer;
+
+        //监听按钮的点击事件，将表单序列化
+        //刷新数据表格，把查询表单数据拼接上
+        $("#doSearch").click(function() {
+            var params = $("#searchForm").serialize();
+            alert(params);
+            tableIns.reload({
+                url:'/notice/queryAllNotice?'+params,
+                page:{curr:1} //条件查询都是跳到第一页
+            })
+        })
+
+        //富文本重置内容
+        $("#layEditResetBtn").click(function () {
+            layedit.setContent(layEditIndex,""); //重置富文本内容
+        })
+
+        //监听头部工具栏事件
+        table.on('toolbar(noticeTable)', function(obj){
+            switch(obj.event){
+                case 'add':
+                    title = '添加'
+                    /*打开弹出层*/
+                    openSaveLayer();
+                    break;
+                case 'deleteBatch':
+                    deteleBatch();
+                    break;
+            };
+        });
+
+        //监听行中工具条点击事件
+        //监听行工具事件
+        table.on('tool(noticeTable)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            if(layEvent === 'del'){ //删除
+
+                layer.confirm('真的删除'+data.title+'么', function(index){
+                        alert(data.noticeid)
+                        $.post("/notice/deleteNotice?id="+data.id,function(rtn) {
+                            //弹出操作成功与否的提示
+                            layer.msg(rtn.msg);
+                            /*接着重新刷新表单*/
+                            tableIns.reload();
+                        })
+
+                    })
+
+                    //向服务端发送删除指令
+            } else if(layEvent === 'edit'){ //编辑
+                //do something
+                openUpdateLayer(data);//打开更新弹出框  ,这里传data过来，这里会获取到该行的数据
+                //用于回显数据
+
+            }else if(layEvent === 'view'){ //查看
+                //do something
+                openViewLayer(data);//打开查看弹出框  ,这里传data过来，这里会获取到该行的数据
+                //用于回显数据
+
+            }
+        });
+
+
+
+        //批量删除
+        function deteleBatch() {
+            layer.confirm('真的删除这些么', function(index){
+                //这里填的是表单的id
+                var checkStatus = table.checkStatus('dataTable');
+              //如果数量为零，就不能删除
+                if(checkStatus.data.length == 0){
+                 	layer.msg("请勾选要选择的项");
+                 	return;
+                 }
+                //拿到选中的每一行信息
+                var data = checkStatus.data;
+                //遍历选中的行信息
+                var params= "";
+                $.each(data,function (index, ele) {
+                    if (index == 0){
+                        params += "ids="+ele.id;
+                    } else {
+                        params += "&ids="+ele.id;
+                    }
+                })
+                alert(params);
+                //发送ajax
+                $.post("/notice/deleteBatchNotice",params,function (rtn) {
+                      layer.msg(rtn.msg);
+                      /*接着重新刷新表单*/
+                      tableIns.reload();
+                })
+            })
+
+        }
+
+        var viewLayer;
+        //打开查看弹出层方法
+        function  openViewLayer(data) {
+            viewLayer = layer.open({
+                type:1,
+                title:data.title,
+                area:['800px','450px'],
+                content:$("#viewDiv"),
+                success:function(index){  //打开弹出层成功后的回调方法
+
+                    $("#view_title").html(data.title);
+                    $("#view_opername").html(data.opername);
+                    $("#view_createtime").html(data.createtime);
+                    $("#view_content").html(data.content);
+
+                }
+            });
+        }
+
+        var layEditIndex;
+        //打开添加弹出层方法
+        function openSaveLayer() {
+            saveOrUpdateLayer = layer.open({
+                type:1,
+                title:'添加公告',
+                area:['800px','450px'],
+                content:$("#saveOrUpdateDiv"),
+                success:function(index){  //打开弹出层成功后的回调方法
+
+                    //清空表单数据
+                    /*每次打开前都清空表单*/
+                    $("#dataForm")[0].reset();
+
+                    /*创建一个编辑器,即开启富文本编辑器*/
+                    layEditIndex = layedit.build('LAY_demo_editor',{
+                        height: 220 //设置编辑器高度
+                    });
+
+                    $("#noticeId").val("");
+
+                    url="/notice/addNotice";  //打开添加的弹出层url改为添加
+                }
+            });
+        }
+
+        //打开更新弹出层方法
+        function openUpdateLayer(data) {
+            saveOrUpdateLayer = layer.open({
+                type:1,
+                title:'编辑公告',
+                content:$("#saveOrUpdateDiv"),
+                area:['800px','450px'],
+                success:function(index){  //打开弹出层成功后的回调方法
+
+                    // /*每次打开前都清空表单*/
+                     $("#dataForm")[0].reset();
+
+                    //回显数据
+                    form.val("dataForm",data);
+
+                    /*创建一个编辑器,即开启富文本编辑器*/
+                    layEditIndex = layedit.build('LAY_demo_editor',{
+                        height: 220 //设置编辑器高度
+                    });
+
+                    url="/notice/updateNotice";  //打开添加的弹出层url改为添加
+
+                }
+            });
+        }
+
+
+        /*监听提交方法*/
+        form.on('submit(doSubmit)', function(data){
+
+            //先把富文本的是数据同步到文本域中，再提交
+            layedit.sync(layEditIndex);
+
+            /*把表单数据提交*/
+            var params = $("#dataForm").serialize();
+            alert($("#dataForm").serialize());
+            alert(url);
+            //ajax提交
+           //ajax提交
+            $.post(url,params,function(rtn) {
+                    //弹出操作成功与否的提示
+                    layer.msg(rtn.msg);
+                    /*接着关闭弹出框*/
+                    layer.close(saveOrUpdateLayer);
+                    /*接着重新刷新表单*/
+                    tableIns.reload();
+                
+            })
+        });
+    })
+
+</script>
+
+</body>
+</html>

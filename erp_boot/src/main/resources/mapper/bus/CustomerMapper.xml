@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.bus.mapper.CustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.itcast.bus.pojo.Customer">
+        <id column="id" property="id" />
+        <result column="customername" property="customername" />
+        <result column="zip" property="zip" />
+        <result column="address" property="address" />
+        <result column="telephone" property="telephone" />
+        <result column="connectionperson" property="connectionperson" />
+        <result column="phone" property="phone" />
+        <result column="bank" property="bank" />
+        <result column="account" property="account" />
+        <result column="email" property="email" />
+        <result column="fax" property="fax" />
+        <result column="available" property="available" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, customername, zip, address, telephone, connectionperson, phone, bank, account, email, fax, available
+    </sql>
+
+</mapper>

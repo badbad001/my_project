@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.bus.mapper.GoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.itcast.bus.pojo.Goods">
+        <id column="id" property="id" />
+        <result column="goodsname" property="goodsname" />
+        <result column="produceplace" property="produceplace" />
+        <result column="size" property="size" />
+        <result column="goodspackage" property="goodspackage" />
+        <result column="productcode" property="productcode" />
+        <result column="promitcode" property="promitcode" />
+        <result column="description" property="description" />
+        <result column="price" property="price" />
+        <result column="number" property="number" />
+        <result column="dangernum" property="dangernum" />
+        <result column="goodsimg" property="goodsimg" />
+        <result column="available" property="available" />
+        <result column="providerid" property="providerid" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, goodsname, produceplace, size, goodspackage, productcode, promitcode, description, price, number, dangernum, goodsimg, available, providerid
+    </sql>
+
+</mapper>

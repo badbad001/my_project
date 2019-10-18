@@ -1,0 +1,111 @@
+
+	 [
+		{
+			"title": "基本管理",
+			"icon": "icon-text",
+			"href": "page/news/newsList.html",
+			"spread": false,
+			"children": [
+				{
+					"title": "客户管理",
+					"icon": "&#xe61c;",
+					"href": "page/404.html",
+					"spread": false
+				},
+				{
+					"title": "联系人管理",
+					"icon": "&#xe609;",
+					"href": "page/login/login.html",
+					"spread": false,
+					"target": "_blank"
+				}
+			]
+		},
+		{
+			"title": "业务管理",
+			"icon": "&#xe634;",
+			"href": "page/img/images.html",
+			"spread": false,
+			"children": [
+				{
+					"title": "汽车出租",
+					"icon": "&#xe61c;",
+					"href": "page/404.html",
+					"spread": false
+				},
+				{
+					"title": "汽车入库",
+					"icon": "&#xe609;",
+					"href": "page/login/login.html",
+					"spread": false,
+					"target": "_blank"
+				}
+			]
+
+		},
+		{
+			"title": "系统管理",
+			"icon": "&#xe634;",
+			"href": "page/img/images.html",
+			"spread": false,
+			"children": [
+				{
+					"title": "用户管理",
+					"icon": "&#xe61c;",
+					"href": "page/404.html",
+					"spread": false
+				},
+				{
+					"title": "修改资料",
+					"icon": "&#xe609;",
+					"href": "page/login/login.html",
+					"spread": false,
+					"target": "_blank"
+				}
+			]
+
+		},
+		{
+			"title": "统计管理",
+			"icon": "&#xe634;",
+			"href": "page/img/images.html",
+			"spread": false,
+			"children": [
+				{
+					"title": "统计数量",
+					"icon": "&#xe61c;",
+					"href": "page/404.html",
+					"spread": false
+				},
+				{
+					"title": "统计月份",
+					"icon": "&#xe609;",
+					"href": "page/login/login.html",
+					"spread": false,
+					"target": "_blank"
+				}
+			]
+
+		},
+		{
+			"title": "其他页面",
+			"icon": "&#xe630;",
+			"href": "",
+			"spread": false,
+			"children": [
+				{
+					"title": "404页面",
+					"icon": "&#xe61c;",
+					"href": "page/404.html",
+					"spread": false
+				},
+				{
+					"title": "登录",
+					"icon": "&#xe609;",
+					"href": "../login.html",
+					"spread": false,
+					"target": "_blank"
+				}
+			]
+		}
+	]

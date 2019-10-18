@@ -1,0 +1,55 @@
+#配置数据源的属性
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/erp?useUnicode=true&characterEncoding=utf8&nullCatalogMeansCurrent=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
+      username: root
+      password:
+      max-active: 20
+      max-wait: 5000
+      initial-size: 1
+      filters: stat,log4j,wall
+      validationQuery: SELECT 'x'   #验证连接
+      enable: true
+      #监控配置
+      stat-view-servlet:
+        enabled: true
+        login-username: root
+        login-password: 123456
+        allow:
+        deny:
+        url-pattern: /druid/*
+  thymeleaf:     #themmeleaf
+    enabled: true
+    cache: false
+  jackson:  #设置返回字符串格式    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8 
+  #mvc:  #设置前端接收的  #  date-format: yyyy-MM-dd HH:mm:ss     activiti:  #关闭验证自动部署    check-process-definitions: false
+#      web-stat-filter:
+#        enabled: true
+#        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+#mybatis-plus
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto  #id自动增长
+  mapper-locations:   # 配置文件mapper
+    - classpath:mapper/*/*Mapper.xml
+  #configuration:  #开启sql输出   # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#shiro的配置    
+shiro:
+  hash-algorithm-name: md5   #加密方式
+  hash-iterations: 2   #散列次数
+  anon-urls:    #匿名访问的
+  - /index.html*
+  - /sys/toLogin*
+  - /login/getCode
+  - /login/login*  
+  - /resources/**
+  - /file/downloadShowFile   #这个查看图片
+  - /user/queryUserImgByLoginname  #查询用户图片
+  log-out-url: /login/logout*
+  login-url: /index.html
+  authc-ulrs:
+  - /**

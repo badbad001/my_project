@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.sys.mapper.PermissionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.itcast.sys.pojo.Permission">
+        <id column="id" property="id" />
+        <result column="pid" property="pid" />
+        <result column="type" property="type" />
+        <result column="title" property="title" />
+        <result column="percode" property="percode" />
+        <result column="icon" property="icon" />
+        <result column="href" property="href" />
+        <result column="target" property="target" />
+        <result column="open" property="open" />
+        <result column="ordernum" property="ordernum" />
+        <result column="available" property="available" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, pid, type, title, percode, icon, href, target, open, ordernum, available
+    </sql>
+    
+    <!-- 删除权限也删除权限角色中间表的东西 -->
+    <select id="deleteRolePermissionByPid">
+         delete from sys_role_permission where pid = #{pid}
+    </select>
+
+</mapper>

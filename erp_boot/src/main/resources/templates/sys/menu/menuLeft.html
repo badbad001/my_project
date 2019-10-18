@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>菜单管理左</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css">
+    <!--模板的css-->
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+    <!--引进dtree的样式-->
+    <link rel="stylesheet" href="/resources/layui_ext/dtree/dtree.css">
+    <link rel="stylesheet" href="/resources/layui_ext/dtree/font/dtreefont.css">
+</head>
+<body>
+
+<!--树的渲染-->
+<div class="childrenBody">
+    <ul id="menuTree" class="dtree" data-id="0"></ul>
+</div>
+
+
+    <!--layui的js-->
+<script src="/resources/layui/layui.js"></script>
+<script>
+    var menuTree;
+    layui.extend({
+       dtree: '/resources/layui_ext/dtree/dtree'   // {/}的意思即代表采用自有路径，即不跟随 base 路径
+    }).use(['dtree','layer','jquery'], function(){
+        var dtree = layui.dtree;
+        var $ = layui.jquery;
+        var layer = layui.layer;
+
+        /*laylist数据风格*/
+        // 初始化树
+        menuTree = dtree.render({
+            elem: "#menuTree",
+            url: "/menu/loadLeftMenuJson",
+            dataStyle: "layuiStyle",  //使用layui风格的数据格式
+            dataFormat: "list",  //配置data的风格为list
+            response:{message:"msg",statusCode:0},  //修改response中返回数据的定义
+           /* checkbar:true, //开启复选框*/
+           // checkbarType: "no-all"
+       });
+
+
+
+    /*单击事件*/
+    dtree.on("node('menuTree')" ,function(obj){
+        //把当前节点的参数都传进来了
+        console.log(obj.param); // 点击当前节点传递的参数
+        //点击当前节点，来刷新右边
+        window.parent.right.reloadTable(obj.param.nodeId);
+    });
+
+
+    })
+
+    </script>
+</body>
+</html>

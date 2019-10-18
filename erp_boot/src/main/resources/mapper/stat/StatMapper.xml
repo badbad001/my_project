@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.stat.mapper.StatMapper">
+
+     <!-- 查询客户地区数据 -->
+     <select id="queryCustomerAreaList" resultType="cn.itcast.stat.pojo.BaseEntity">
+        SELECT COUNT(*) AS VALUE,address AS NAME FROM bus_customer GROUP BY address;
+    </select>
+    
+    <!-- 统计年度销售额 -->
+     <select id="queryYearGrade" resultType="java.lang.Double">
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'01')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'02')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'03')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'04')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'05')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'06')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'07')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'08')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'09')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'10')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'11')
+        union all
+        SELECT SUM(saleprice) FROM bus_sales WHERE DATE_FORMAT(salestime,"%Y%m")=CONCAT(#{year},'12')
+
+    </select>
+    
+    <!-- 查询客户年度销售额 -->
+     <select id="queryCustomerYearSales" resultType="cn.itcast.stat.pojo.BaseEntity">
+         SELECT SUM(saleprice) AS VALUE,customerid AS NAME
+         FROM bus_sales
+         WHERE DATE_FORMAT(salestime,'%Y') = #{year} GROUP BY customerid
+    </select>
+
+</mapper>

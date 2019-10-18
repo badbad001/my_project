@@ -1,0 +1,63 @@
+{
+  "code": 0,
+  "msg": "",
+  "count": 3000000,
+  "data": [
+    {
+      "id": "10001",
+      "username": "杜甫",
+      "email": "xianxin@layui.com",
+      "sex": "男",
+      "city": "浙江杭州"
+    },
+    {
+      "id": "10002",
+      "username": "李白",
+      "email": "xianxin@layui.com",
+      "sex": "男",
+      "city": "浙江杭州"
+    },
+    {
+      "id": "10003",
+      "username": "王勃",
+      "email": "xianxin@layui.com",
+      "sex": "男",
+      "city": "浙江杭州"
+    },
+    {
+      "id": "10004",
+      "username": "李清照",
+      "email": "xianxin@layui.com",
+      "sex": "女",
+      "city": "浙江杭州"
+    },
+    {
+      "id": "10005",
+      "username": "冰心",
+      "email": "xianxin@layui.com",
+      "sex": "女",
+      "city": "浙江杭州"
+    },
+    {
+      "id": "10006",
+      "username": "贤心",
+      "email": "xianxin@layui.com",
+      "sex": "男",
+      "city": "浙江杭州"
+    },
+    {
+      "id": "10007",
+      "username": "贤心",
+      "email": "xianxin@layui.com",
+      "sex": "男",
+      "city": "浙江杭州"
+    },
+    {
+      "id": "10008",
+      "username": "贤心",
+      "email": "xianxin@layui.com",
+      "sex": "男",
+      "city": "浙江杭州"
+    }
+  ]
+}

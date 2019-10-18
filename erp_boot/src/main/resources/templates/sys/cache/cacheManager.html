@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>日志管理</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css">
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+
+</head>
+
+<body class="childrenBody">
+<!--条件查询start-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>缓存查询</legend>
+</fieldset>
+
+
+<!--表格渲染的-->
+<table class="layui-hide" id="dataTable" lay-filter="cacheTable"></table>
+<!--定义表头按钮，不显示-->
+<div class="layui-btn-container" style="display: none" id="toolbarDemo">
+    <button class="layui-btn  layui-btn-sm" lay-event="syscData">同步缓存</button>
+    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="removeAll">清除缓存</button>
+</div>
+
+<!--右边的按钮-->
+<div style="display: none" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</div>
+
+<!--layui的js-->
+<script src="/resources/layui/layui.js"></script>
+<script>
+    var tableIns;
+   
+
+    layui.use(['table','layer','jquery','element'], function(){
+        var $ = layui.jquery;
+       
+        var table = layui.table;
+     
+        var layer = layui.layer;
+       
+
+       
+        tableIns=table.render({
+            elem: '#dataTable'
+            ,url:'/cache/queryAllCache'
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+          
+            ,loading:true
+            // ,totalRow:true
+            ,title: '缓存数据表'
+            ,cols: [ [
+                {type: 'checkbox', fixed: 'left',align:'center'}
+                ,{field:'key', title:'key',width:100,align:'center'}
+                ,{field:'value', title:'value',align:'center'}
+               
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200,align:'center' }
+            ] ]
+            ,done: function(res, curr, count){ //处理删除某一页最后一条数据的BUG
+		        if(res.data.length==0&&curr!=1){
+		        	tableIns.reload({
+		        		page:{
+		        			curr:(curr-1)
+		        		}
+		        	});
+		        }
+		    }
+        });
+
+      
+        //监听头部工具栏事件
+        table.on('toolbar(cacheTable)', function(obj){
+            switch(obj.event){
+                case 'removeAll': //清除缓存
+                	removeAll();
+                    break;
+                case 'syscData': //同步缓存
+                	syscData();
+                    break;
+            };
+        });
+
+        //监听行中工具条点击事件
+        //监听行工具事件
+        table.on('tool(cacheTable)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            if(layEvent === 'del'){ //删除
+
+                layer.confirm('真的删除'+data.key+'么', function(index){
+                  
+                    $.post("/cache/removeCacheByKey?key="+data.key,function(rtn) {
+                        //弹出操作成功与否的提示
+                        layer.msg(rtn.msg);
+                        /*接着重新刷新表单*/
+                        tableIns.reload();
+                    })
+
+                })
+
+                //向服务端发送删除指令
+            }
+        });
+
+
+
+        //清除缓存
+        function removeAll() {
+            layer.confirm('真的清除缓存么', function(index){
+               
+                //发送ajax
+                $.post("/cache/removeAll",function (rtn) {
+                    layer.msg(rtn.msg);
+                    /*接着重新刷新表单*/
+                    tableIns.reload();
+                })
+            })
+
+        }
+        
+        //同步缓存
+        function syscData() {
+            layer.confirm('真的同步缓存么', function(index){
+               
+                //发送ajax
+                $.post("/cache/syscData",function (rtn) {
+                    layer.msg(rtn.msg);
+                    /*接着重新刷新表单*/
+                    tableIns.reload();
+                })
+            })
+
+        }
+    })
+
+</script>
+
+</body>
+</html>

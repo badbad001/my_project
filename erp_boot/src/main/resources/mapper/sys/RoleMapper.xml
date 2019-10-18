@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.sys.mapper.RoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.itcast.sys.pojo.Role">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="remark" property="remark" />
+        <result column="available" property="available" />
+        <result column="createtime" property="createtime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, remark, available, createtime
+    </sql>
+    
+    <!--删除sys_role_user中间表的数据  -->
+     <delete id="deleteRolePermissionByRid">
+        delete from sys_role_permission where rid = #{rid}
+     </delete>
+    
+    <!-- 删除sys_role_user中间表的数据 -->
+    <delete id="deleteRoleUserByRid">
+        delete from sys_role_user where rid = #{rid}
+    </delete>
+    
+    <!-- 根据角色id去中间表查 角色所拥有的权限id集合 
+        List<Integer> queryRolePermissionId(Integer id);
+    -->
+   
+	<select id="queryRolePermissionId" resultType="java.lang.Integer">
+	   select pid from sys_role_permission where rid = #{rid}
+	</select>
+	
+	<!-- 添加角色权限
+	void addRolePermission(@Param("rid")Integer rid,@Param("pid")Integer pid);
+	 -->
+	 
+	<insert id="addRolePermission">
+	   insert into sys_role_permission values(#{rid},#{pid})
+	</insert>
+	
+	
+	<!--//查询用户角色id集合  根据用户id
+	List<Integer> queryUserRoleIdsByUid(Integer id);  -->
+	
+	<select id="queryUserRoleIdsByUid" resultType="java.lang.Integer">
+	     select * from sys_role_user where uid = #{uid}
+	</select>
+	
+	<!--	//删除用户角色
+	void deleteUserRoleByUid(Integer uid);
+	  -->
+	
+	<delete id="deleteUserRoleByUid">
+	    delete from sys_role_user where uid = #{uid}
+	</delete>
+	
+	<!--  //添加用户角色
+	void addUserRole(@Param("rid")Integer rid,@Param("uid") Integer uid);-->
+	<insert id="addUserRole">
+	    insert into sys_role_user values(#{rid},#{uid})
+	</insert>
+	
+</mapper>

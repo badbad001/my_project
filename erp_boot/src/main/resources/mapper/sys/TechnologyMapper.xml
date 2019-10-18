@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.sys.mapper.TechnologyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.itcast.sys.pojo.Technology">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name
+    </sql>
+    
+    <!--//查询用户技术的id集合
+	List<Integer> queryUserTechnologyByUid(Integer id);  -->
+	
+    <select id="queryUserTechnologyByUid" resultType="java.lang.Integer" >
+        select tid from sys_user_technology where uid = #{uid}
+    </select>
+
+    <!-- //删除用户技术中间表数据
+	void deleteUserTechnologyByUid(Integer id);-->
+	
+	<delete id="deleteUserTechnologyByUid">
+	     delete from sys_user_technology where uid = #{uid}
+	</delete>
+	
+	 <!-- //分配用户技术
+	void addUserTechnology(Integer id, Integer tid); -->
+	
+	<insert id="addUserTechnology">
+	     insert into sys_user_technology values(#{uid},#{tid})
+	</insert>
+
+</mapper>

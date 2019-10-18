@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>工作流管理</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css">
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+
+    
+</head>
+
+<body class="childrenBody">
+<!--条件查询start-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>工作流查询</legend>
+</fieldset>
+
+<!--条件查询表单-->
+<form class="layui-form" action="" lay-filter="searchFrom" id="searchForm">
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">部署名:</label>
+            <div class="layui-input-inline">
+                <input type="text" name="deploymentName"  autocomplete="off" class="layui-input">
+            </div>
+           
+            <button type="button" class="layui-btn layui-btn-normal " lay-filter="demo1" id="doSearch">查询</button>
+            <button type="reset" class="layui-btn layui-btn-warm">重置</button>
+            
+        </div>
+        <div class="layui-inline">
+          
+          
+        </div>
+    </div>
+
+</form>
+
+<!--添加和提交的框start-->
+<div style="display: none;padding: 20px" id="saveOrUpdateDiv" >
+    <form class="layui-form"  lay-filter="dataForm" id="dataForm">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">部署名称:</label>
+            <div class="layui-input-block">
+                <input type="hidden" name="id">
+                <input type="text" name="deploymentName" lay-verify="required" id="deploymentName"  placeholder="请输入部署名称" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+           <label class="layui-form-label">选择文件:</label>
+           <div class="layui-upload">
+			  <button type="button" class="layui-btn layui-btn-normal" id="processFile">选择流程图文件</button>			 
+			</div>
+        </div>
+
+        <div class="layui-form-item" style="text-align: center;">
+            <div class="layui-input-block">
+                <button type="button" id="addWorkFlow" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-release" lay-filter="doSubmit" lay-submit="">提交</button>
+                <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--添加和提交的框end-->
+
+<!--表格渲染的-->
+<!--流程部署表格  -->
+<table class="layui-hide" id="deploymentTable" lay-filter="deploymentTable"></table>
+
+<!--表格渲染的-->
+<!--流程定义表格  -->
+<table class="layui-hide" id="processDefTable" lay-filter="processDefTable"></table>
+
+
+<!--定义表头按钮，不显示-->
+<div class="layui-btn-container" style="display: none" id="toolbarDemo">
+    <button class="layui-btn layui-btn-sm" lay-event="add" >添加流程部署</button>
+    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="deleteBatch">批量删除</button>
+</div>
+
+<!--右边的按钮-->
+<div style="display: none" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="view">查看流程图</a>
+</div>
+
+<!--查看图片-->
+<div style="display: none;" id="viewDiv">
+    <div style="text-align: center">
+        <img  id="viewImg" src=""  width=800 height="400">
+    </div>
+</div>
+
+<!--layui的js-->
+<script src="/resources/layui/layui.js"></script>
+<script>
+    
+    //流程部署
+    var depTableIns;
+    //流程定义
+    var processTableIns;
+   
+  
+    layui.use(['table','layer','jquery','element','form','upload'], function(){
+        var $ = layui.jquery;
+        var form = layui.form;
+        var table = layui.table;      
+        var layer = layui.layer;
+        var upload = layui.upload;
+        
+        //渲染上传流程文件   
+      //选完文件后不自动上传
+         //选完文件后不自动上传
+        upload.render({
+	          elem: '#processFile'
+	          ,url: '/workflow/addWorkFlow'
+	          ,auto: false
+	          ,accept:'file'//选择上传文件
+	          ,acceptMime:'application/zip'//打开文件选择框默认显示压缩文件
+	          ,exts: 'zip'//校验类型
+	          ,field:'mf'
+	          ,data:{   //这个是附加别的属性传过去
+	        	  deploymentName:function(){
+	        		  return $('#deploymentName').val();
+	        	  }
+	          }
+	          ,bindAction: '#addWorkFlow'
+	          ,done: function(data){
+	        	  layer.msg(data.msg);
+	              //关闭部署的弹出层
+	              layer.close(saveOrUpdateLayer);
+	              
+	              //刷新那两个数据表格
+                  depTableIns.reload();
+                  processTableIns.reload();
+	              
+	          }
+	        ,error:function(){
+	        	layer.msg('部署失败');
+	        	//关闭部署的弹出层
+	            layer.close(saveOrUpdateLayer);
+	              
+	            //刷新那两个数据表格
+                depTableIns.reload();
+                processTableIns.reload();
+	        }
+        });
+        
+       
+        //流程部署数据表格
+        depTableIns=table.render({
+            elem: '#deploymentTable'
+      	    ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+            ,url:'/workflow/queryAllDeployment'
+            ,height:'full-300'
+            ,limit:4
+            ,limits:[4,6,8]
+            ,loading:true
+            // ,totalRow:true
+            ,title: '流程部署数据表'
+            ,cols: [ [
+                {type: 'checkbox', fixed: 'left',align:'center'}
+                ,{field:'id', title:'流程部署ID',width:100,align:'center'}
+                ,{field:'name', title:'部署名称',align:'center'}             
+                ,{field:'deploymentTime', title:'部署时间',align:'center'}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200,align:'center' }
+            ] ]
+            ,page: true
+            ,done: function(res, curr, count){ //处理删除某一页最后一条数据的BUG
+		        if(res.data.length==0&&curr!=1){
+		        	depTableIns.reload({
+		        		page:{
+		        			curr:(curr-1)
+		        		}
+		        	});
+		        }
+		    }
+        });
+        
+        
+      //流程定义数据表格
+        processTableIns=table.render({
+            elem: '#processDefTable'
+            ,url:'/workflow/queryAllProcessDef'
+            ,height:'full-300'
+            ,limit:4
+            ,limits:[4,6,8]
+            ,loading:true
+            // ,totalRow:true
+            ,title: '流程定义数据表'
+            ,cols: [ [
+               
+                {field:'id', title:'流程定义ID',width:100,align:'center', width:200}
+                ,{field:'name', title:'定义名称',align:'center', width:200}             
+                ,{field:'key', title:'定义KEY',align:'center', width:150}             
+                ,{field:'version', title:'定义版本',align:'center', width:120}             
+                ,{field:'deploymentId', title:'部署ID',align:'center', width:100}
+                ,{field:'resourceName', title:'资源名称[bpmn]',align:'center', width:200}
+                ,{field:'diagramResourceName', title:'资源名称[png]',align:'center', width:200}
+               
+            ] ]
+            ,page: true
+            ,done: function(res, curr, count){ //处理删除某一页最后一条数据的BUG
+		        if(res.data.length==0&&curr!=1){
+		        	depTableIns.reload({
+		        		page:{
+		        			curr:(curr-1)
+		        		}
+		        	});
+		        }
+		    }
+        });
+
+
+
+
+        var title = '';
+        var url = '';
+        var saveOrUpdateLayer;
+
+        //监听按钮的点击事件，将表单序列化
+        //刷新数据表格，把查询表单数据拼接上
+        $("#doSearch").click(function() {
+            var params = $("#searchForm").serialize();
+            alert(params);
+            
+            //点击查询按钮，查询两个表数据
+            
+            //部署数据表
+            depTableIns.reload({
+                url:'/workflow/queryAllDeployment?'+params,
+                page:{curr:1} //查询都是跳到第一页
+            })
+            //流程定义表
+            processTableIns.reload({
+                url:'/workflow/queryAllProcessDef?'+params,
+                page:{curr:1} //查询都是跳到第一页
+            })
+        })
+        
+         //监听头部工具栏事件
+        table.on('toolbar(deploymentTable)', function(obj){
+            switch(obj.event){
+	            case 'add':
+	               title = '添加'
+	               /*打开弹出层*/
+	               openSaveLayer();
+	               break;
+                case 'deleteBatch':
+                    deteleBatch();
+                    break;
+            };
+        });
+        
+        
+      //打开添加弹出层方法
+        function openSaveLayer() {
+            saveOrUpdateLayer = layer.open({
+                type:1,
+                title:'部署流程',
+                area:['600px','300px'],
+                content:$("#saveOrUpdateDiv"),
+                success:function(index){  //打开弹出层成功后的回调方法
+                    //清空表单数据
+                    /*每次打开前都清空表单*/
+                    $("#dataForm")[0].reset();
+                   
+                    url="/workflow/addWorkFlow";  //打开添加的弹出层url改为添加
+                                        
+                }
+            });
+        }
+
+      
+
+        //监听行中工具条点击事件
+        //监听行工具事件
+        table.on('tool(deploymentTable)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            if(layEvent === 'del'){ //删除
+
+                layer.confirm('真的删除'+data.name+'么', function(index){
+                    alert(data.loginInfoid)
+                    $.post("/workflow/deleteWorkFlow?id="+data.id,function(rtn) {
+                        //弹出操作成功与否的提示
+                        layer.msg(rtn.msg);
+                        //刷新那两个数据表格
+                        depTableIns.reload();
+                        processTableIns.reload();
+                    })
+
+                })
+
+                //向服务端发送删除指令
+            }else if(layEvent === 'view'){ //查看图片
+                //do something
+                openViewLayer(data);//打开更新弹出框  ,这里传data过来，这里会获取到该行的数据
+                //用于回显数据
+
+            }
+        });
+
+        var viewLayer;
+        //打开查看弹出层方法
+        function  openViewLayer(data) {
+            viewLayer = layer.open({
+                type:1,
+                title:data.name,              
+                area:['800px','450px'],
+                content:$("#viewDiv"),
+                success:function(index){  //打开弹出层成功后的回调方法
+
+                   $("#viewImg").attr("src","/workflow/viewProcessImage?id="+data.id);
+
+                }
+            });
+        }
+
+
+        //批量删除
+        function deteleBatch() {
+            layer.confirm('真的删除这些么', function(index){
+                //这里填的是表单的id
+                var checkStatus = table.checkStatus('deploymentTable');
+                //如果数量为零，就不能删除
+                if(checkStatus.data.length == 0){
+                 	layer.msg("请勾选要选择的项");
+                 	return;
+                 }
+                //拿到选中的每一行信息
+                var data = checkStatus.data;
+                //遍历选中的行信息
+                var params= "";
+                $.each(data,function (index, ele) {
+                    if (index == 0){
+                        params += "ids="+ele.id;
+                    } else {
+                        params += "&ids="+ele.id;
+                    }
+                })
+                alert(params);
+                //发送ajax
+                $.post("/workflow/deleteBatchWorkFlow",params,function (rtn) {
+                    layer.msg(rtn.msg);
+                    //刷新那两个数据表格
+                    depTableIns.reload();
+                    processTableIns.reload();
+                })
+            })
+
+        }
+    })
+
+</script>
+
+</body>
+</html>

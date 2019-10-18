@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品进货管理</title>
+    <link rel="stylesheet" href="/resources/layui/css/layui.css">
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+
+    
+</head>
+
+<body class="childrenBody">
+<!--条件查询start-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>商品进货查询</legend>
+</fieldset>
+
+<!--条件查询表单-->
+<form class="layui-form" action="" lay-filter="searchFrom" id="searchForm">
+    
+     <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">供应商:</label>
+            <div class="layui-input-inline">
+                 <select name="providerid"  id="provider_select_search">
+			                <option value="">点击选择供应商</option>
+			     </select>
+			    
+            </div>
+            <label class="layui-form-label">商品名称:</label>
+             <div class="layui-input-inline">
+                 <select name="goodsid" id="goods_select_search">
+			            <option value="">点击选择商品</option>			               
+			     </select>
+			     
+             </div>
+            <label class="layui-form-label">操作员:</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="operateperson"  autocomplete="off" class="layui-input">
+            </div>
+                         
+        </div>     
+    </div>
+
+    
+    <div class="layui-form-item">
+	       <div class="layui-inline">
+	            <label class="layui-form-label">开始时间:</label>
+	            <div class="layui-input-inline">
+	                <input type="tel" name="startTime" id="startTime"  autocomplete="off" class="layui-input">
+	            </div>
+	            <label class="layui-form-label">结束时间:</label>
+	            <div class="layui-input-inline">
+	                <input type="tel" name="endTime" id="endTime" autocomplete="off" class="layui-input">
+	            </div>
+	            
+	            <div style="display: inline-block;width: 40px"></div>
+	            
+	            <button type="button" class="layui-btn layui-btn-normal" lay-filter="demo1" id="doSearch">查询</button>
+	            <button type="reset" class="layui-btn layui-btn-warm">重置</button>
+	      </div>
+    </div>
+    
+    
+</form>
+
+<!--添加和提交的框start-->
+<div style="display: none;padding: 20px" id="saveOrUpdateDiv" >
+    <form class="layui-form"  lay-filter="dataForm" id="dataForm">
+
+        <div class="layui-form-item">
+		        <div class="layui-inline">
+		            <label class="layui-form-label">供应商:</label>
+		            <div class="layui-input-inline">
+		                 <select name="providerid"  id="provider_select" lay-filter="provider_select">
+					                <option value="">点击选择供应商</option>
+					     </select>
+					     <!-- 加这个是在select上面加个罩子不能点击 -->
+                         <div class="mydiv" title="不可修改" style="position:absolute;width:100%;height:100%;
+                              left:0px;top:0px;background:#fff;opacity:0;filter:alpha(opacity=0)">  </div>
+		            </div>
+		            <label class="layui-form-label">商品名称:</label>
+		            <div class="layui-input-inline">
+		                <!-- 隐藏的进货id -->
+		                 <input type="hidden" name="id">
+		                 <select name="goodsid" id="goods_select">
+					            <option value="">点击选择商品</option>			               
+					     </select>
+					      <!-- 加这个是在select上面加个罩子不能点击 -->
+                         <div class="mydiv" title="不可修改" style="position:absolute;width:100%;height:100%;
+                              left:0px;top:0px;background:#fff;opacity:0;filter:alpha(opacity=0)">  </div>
+			              
+		            </div>		            		                         
+		       </div>     
+       </div>
+       
+       <div class="layui-form-item">
+            <div class="layui-inline">
+	            <label class="layui-form-label">进货数量:</label>
+	            <div class="layui-input-inline">
+	                <input type="text" name="number" placeholder="请输进货数量" autocomplete="off"
+	                       class="layui-input">               
+	            </div>
+            
+	            <label class="layui-form-label">进货价格:</label>
+	            <div class="layui-input-inline">
+	                <input type="text" name="inportprice" placeholder="请输入进货价格" autocomplete="off"
+	                       class="layui-input">   
+	            </div>
+	          </div>   
+        </div> 
+        
+        <div class="layui-form-item">
+			    <label class="layui-form-label">支付类型</label>
+			    <div class="layui-input-block">
+			      <input type="radio" name="paytype" value="支付宝" title="支付宝" checked="checked">
+			      <input type="radio" name="paytype" value="微信" title="微信" >
+			      <input type="radio" name="paytype" value="现金" title="现金" >
+			      <input type="radio" name="paytype" value="信用卡" title="信用卡" >			     
+			    </div>
+        </div> 
+        
+        <!-- 备注 -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">备注:</label>
+                    <div class="layui-input-inline">
+                          <textarea placeholder="请输入备注" class="layui-textarea" name="remark"></textarea>
+                    </div>
+                </div>             
+            </div>
+			
+        <div class="layui-form-item" style="text-align: center;">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-release" lay-filter="doSubmit" lay-submit="">提交</button>
+                <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--添加和提交的框end-->
+
+
+<!--退货的框start-->
+<div style="display: none;padding: 20px" id="backDiv" >
+    <form class="layui-form"  lay-filter="backForm" id="backForm">
+    
+          <div class="layui-form-item">
+            <div class="layui-inline">
+	            <label class="layui-form-label">退货数量:</label>
+	            <div class="layui-input-inline">
+	            
+	                <!-- 退货要传到后台的 -->
+	                <input name="inportid" type="hidden" id="inport_back">
+	                <!-- 这个是进货单的进货数量  退货数量不能大于进货单的数量 加个自定义验证-->
+	                <input type="hidden" id="inport_number" >
+	                
+	                <input type="text" name="number" placeholder="请输入退货数量" lay-verify="required|checkBackNum|number" autocomplete="off"
+	                       class="layui-input">               
+	            </div>	          
+	       </div>   
+        </div> 
+                
+         <div class="layui-form-item">
+                <label class="layui-form-label">备注:</label>     
+                <div class="layui-input-block">                              
+                    <textarea placeholder="请输入备注" class="layui-textarea" name="remark"></textarea>                   
+                </div>             
+         </div>
+    
+        <div class="layui-form-item" style="text-align: center;">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-release" lay-filter="doBackSubmit" lay-submit="">提交</button>
+                <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--退货的框end-->
+
+
+<!--表格渲染的-->
+<table class="layui-hide" id="dataTable" lay-filter="loginInfoTable"></table>
+<!--定义表头按钮，不显示-->
+<div class="layui-btn-container" style="display: none" id="toolbarDemo">
+    <button class="layui-btn layui-btn-sm" lay-event="add" >添加</button>
+    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="deleteBatch">批量删除</button>
+</div>
+<!--右边的按钮-->
+<div style="display: none" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="back">退货</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</div>
+
+
+
+<!--layui的js-->
+<script src="/resources/layui/layui.js"></script>
+<script>
+    var tableIns;
+    
+
+    layui.use(['table','layer','jquery','element','form','laydate'], function(){
+        var $ = layui.jquery;
+        var form = layui.form;
+        var table = layui.table;
+       
+        var layer = layui.layer;
+        
+        var laydate = layui.laydate;
+
+        //渲染时间
+        laydate.render({
+            elem:'#startTime',
+            type:'datetime'
+        });
+        laydate.render({
+            elem:'#endTime',
+            type:'datetime'
+        });
+        
+        
+      
+        tableIns=table.render({
+            elem: '#dataTable'
+            ,url:'/inport/queryAllInport'
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+            ,height:'full-180'
+            ,limit:5
+            ,limits:[5,7,10]
+            ,loading:true
+            // ,totalRow:true
+            ,title: '商品进货数据表'
+            ,cols: [ [
+                {type: 'checkbox', fixed: 'left',align:'center'}
+                ,{field:'id', title:'ID',width:100,align:'center'}
+                ,{field:'providerid', title:'供应商id',align:'center', width:200}
+                ,{field:'providername', title:'供应商名字',align:'center', width:200}
+                ,{field:'goodsid', title:'商品id',align:'center', width:200}
+                ,{field:'goodsname', title:'商品名字',align:'center', width:200}
+               
+                ,{field:'paytype', title:'支付方式',align:'center', width:200}
+                ,{field:'inporttime', title:'进货时间',align:'center', width:200}
+                ,{field:'operateperson', title:'操作员',align:'center', width:200}
+                ,{field:'number', title:'数量',align:'center', width:200}
+                ,{field:'remark', title:'备注',align:'center', width:200}
+                ,{field:'inportprice', title:'进货金额',align:'center', width:200}
+
+               
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200,align:'center' }
+            ] ]
+            ,page: true
+            ,done: function(res, curr, count){ //处理删除某一页最后一条数据的BUG
+		        if(res.data.length==0&&curr!=1){
+		        	tableIns.reload({
+		        		page:{
+		        			curr:(curr-1)
+		        		}
+		        	});
+		        }
+		    }
+        });
+        
+        
+        //页面加载成功,ajax回显供应商下拉框
+        $.get("/provider/queryAllProviderForList",function(rtn){
+        	 var providers = rtn.data;
+        	 
+        	 var option = '<option value="">点击选择供应商</option>';
+        	 $.each(providers,function(index,ele){
+        		 option += '<option value='+ele.id+'>'+ele.providername+'</option>';
+        	 })
+        	 
+        	 $("#provider_select_search").html(option);
+        	 
+        	 form.render("select");
+        })
+        
+       
+         //页面加载成功,ajax回显商品下拉框
+        $.get("/goods/queryAllGoodsForList",function(rtn){
+        	 var providers = rtn.data;
+        	 
+        	 var option = '<option value="">点击选择商品</option>';
+        	 $.each(providers,function(index,ele){
+        		 option += '<option value='+ele.id+'>'+ele.goodsname+'-'+ele.size+'-'+ele.providername+'</option>';
+        	 })
+        	 
+        	 $("#goods_select_search").html(option);
+        	 
+        	 form.render("select");
+        })
+        
+        
+        //加载供应商  用于添加和修改进货单
+        function initSelectProvider(providerid){
+        	  //ajax回显供应商下拉框
+            $.get("/provider/queryAllProviderForList",function(rtn){
+            	 var providers = rtn.data;
+            	 
+            	 var option = '<option value="">点击选择供应商</option>';
+            	 $.each(providers,function(index,ele){
+            		 option += '<option value='+ele.id+'>'+ele.providername+'</option>';
+            	 })
+            	 
+            	 $("#provider_select").html(option);
+            	 
+            	 //供应商不为未定义才去回选选中
+            	 if(providerid!=undefined){ 
+            		 //回显下来框
+                	 $("#provider_select").val(providerid);
+            	 }
+            	 
+            	 form.render("select");
+            })            
+        }
+        
+        //这个是监听添加修改供应商下拉框的
+        form.on('select(provider_select)', function(data){
+        	  
+        	 $("#goods_select").html("");
+        
+        	  console.log(data.value); //得到被选中的值
+        	  
+        	  //拿到选中的置
+        	  var providerid = data.value;
+        	
+        	  //接着拿供应商id查询供应商所拥有的商品
+        	  initSelectGoods(providerid);
+        });      
+        
+        
+        //加载供应商的商品
+        function initSelectGoods(providerid,goodsid){
+        	  //ajax回显商品下拉框
+        	 
+            $.get("/goods/queryGoodsByProviderId?providerid="+providerid,function(rtn){
+            	 var goods = rtn.data;
+            	 
+            	 var option = '<option value="">点击选择商品</option>';
+            	 $.each(goods,function(index,ele){
+            		 option += '<option value='+ele.id+'>'+ele.goodsname+'-'+ele.size+'-'+ele.providername+'</option>';
+            	 })
+            	 
+            	 $("#goods_select").html(option);
+            	 
+            	 form.render("select");
+            	 
+            	 //商品id不为未定义才去回选选中
+            	 if(goodsid!=undefined){
+            		 //回显下来框
+                	 $("#goods_select").val(goodsid);
+            	 }
+            })
+        }
+
+        var title = '';
+        var url = '';
+        var saveOrUpdateLayer;
+        var backLayer;  //退货弹出层
+
+        //监听按钮的点击事件，将表单序列化
+        //刷新数据表格，把查询表单数据拼接上
+        $("#doSearch").click(function() {
+            var params = $("#searchForm").serialize();
+            alert(params);
+            tableIns.reload({
+                url:'/inport/queryAllInport?'+params,
+                page:{curr:1} //查询都是跳到第一页
+            })
+        })
+
+        //监听头部工具栏事件
+        table.on('toolbar(loginInfoTable)', function(obj){
+            switch(obj.event){
+	            case 'add':
+	               title = '添加'
+	               /*打开弹出层*/
+	               openSaveLayer();
+	               break;
+                case 'deleteBatch':
+                    deteleBatch();
+                    break;
+            };
+        });
+
+        //监听行中工具条点击事件
+        //监听行工具事件
+        table.on('tool(loginInfoTable)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            if(layEvent === 'del'){ //删除
+
+                layer.confirm('真的删除【'+data.inportname+'】商品进货么', function(index){
+                    alert(data.loginInfoid)
+                    $.post("/inport/deleteInport?id="+data.id,function(rtn) {
+                        //弹出操作成功与否的提示
+                        layer.msg(rtn.msg);
+                        /*接着重新刷新表单*/
+                        tableIns.reload();
+                    })
+
+                })
+
+                //向服务端发送删除指令
+            }  else if(layEvent === 'edit'){ //编辑
+                //do something
+                openUpdateLayer(data);//打开更新弹出框  ,这里传data过来，这里会获取到该行的数据   
+
+            }  else if(layEvent === 'back'){ //退货
+               
+                openBackLayer(data);//打开退货弹出框  ,这里传data过来，这里会获取到该行的数据   
+
+            }
+        });
+        
+        
+        //打开退货弹出层方法
+        function openBackLayer(data) {
+        	backLayer = layer.open({
+                type:1,
+                title:'商品退货',
+                area:['600px','320px'],
+                content:$("#backDiv"),
+                success:function(index){  //打开弹出层成功后的回调方法
+                    //清空表单数据
+                    /*每次打开前都清空表单*/
+                    $("#backForm")[0].reset();
+                   
+                    url="/outport/addOutPort";  //打开添加的弹出层url改为添加
+                                
+                    //这个设置隐藏的原来进货单的数量
+                    $("#inport_number").val(data.number);
+                    
+                    //这个设置进货单的隐藏id，提交到后台查数据
+                    $("#inport_back").val(data.id);                    
+             
+                }
+            });
+        }
+        
+        
+
+        //打开添加弹出层方法
+        function openSaveLayer() {
+            saveOrUpdateLayer = layer.open({
+                type:1,
+                title:'添加商品进货',
+                area:['800px','520px'],
+                content:$("#saveOrUpdateDiv"),
+                success:function(index){  //打开弹出层成功后的回调方法
+                    //清空表单数据
+                    /*每次打开前都清空表单*/
+                    $("#dataForm")[0].reset();
+                   
+                    url="/inport/addInport";  //打开添加的弹出层url改为添加
+                               
+                    //加载供应商
+                    initSelectProvider();  
+                    
+                    //禁用供应商和商品的下拉框 在上面加罩子罩住不能点
+                    //打开添加弹出层就添加隐藏罩子
+					$(".mydiv").hide();
+                                                   
+                }
+            });
+        }
+        
+        //打开更新弹出层方法
+        function openUpdateLayer(data) {
+            saveOrUpdateLayer = layer.open({
+                type:1,
+                title:'编辑商品进货',
+                content:$("#saveOrUpdateDiv"),
+                area:['800px','520px'],
+                success:function(index){  //打开弹出层成功后的回调方法
+                    /*每次打开前都清空表单*/
+                    $("#dataForm")[0].reset();
+                
+                    //回显选中供应商
+                    initSelectProvider(data.providerid);
+                    
+                    //回显选中商品id
+                    initSelectGoods(data.providerid,data.goodsid);
+                    
+                    
+                    //回显数据
+                    form.val("dataForm",data);
+                    url="/inport/updateInport";  //打开添加的弹出层url改为添加
+                    
+                    
+                    //禁用供应商和商品的下拉框 在上面加罩子罩住不能点
+					$(".mydiv").show();
+
+                }
+            });
+        }
+
+
+        //批量删除
+        function deteleBatch() {
+            layer.confirm('真的删除这些么', function(index){
+                //这里填的是表单的id
+                var checkStatus = table.checkStatus('dataTable');
+                //如果数量为零，就不能删除
+                if(checkStatus.data.length == 0){
+                 	layer.msg("请勾选要选择的项");
+                 	return;
+                 }
+                //拿到选中的每一行信息
+                var data = checkStatus.data;
+                //遍历选中的行信息
+                var params= "";
+                $.each(data,function (index, ele) {
+                    if (index == 0){
+                        params += "ids="+ele.id;
+                    } else {
+                        params += "&ids="+ele.id;
+                    }
+                })
+                alert(params);
+                //发送ajax
+                $.post("/inport/deleteBatchInport",params,function (rtn) {
+                    layer.msg(rtn.msg);
+                    /*接着重新刷新表单*/
+                    tableIns.reload();
+                })
+            })
+        }
+        
+        
+        /*监听提交方法*/
+        form.on('submit(doSubmit)', function(data){
+            /*把表单数据提交*/
+            var params = $("#dataForm").serialize();
+            alert($("#dataForm").serialize());
+            alert(url);
+            console.log(params)
+            //ajax提交
+            $.post(url,params,function(rtn) {
+                    //弹出操作成功与否的提示
+                    layer.msg(rtn.msg);
+                    /*接着关闭弹出框*/
+                    layer.close(saveOrUpdateLayer);
+                    /*接着重新刷新表单*/
+                    tableIns.reload();
+                   
+            })  
+            
+            return false;//阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        
+        
+        /*监听退货框提交方法*/
+        form.on('submit(doBackSubmit)', function(data){
+            /*把表单数据提交*/
+            var params = $("#backForm").serialize();
+            alert($("#backForm").serialize());
+            alert(url);
+            console.log(params)
+            //ajax提交
+            $.post(url,params,function(rtn) {
+                    //弹出操作成功与否的提示
+                    layer.msg(rtn.msg);
+                    /*接着关闭弹出框*/
+                    layer.close(backLayer);
+                    /*接着重新刷新表单*/
+                    tableIns.reload();
+                   
+            })  
+            
+            return false;//阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        
+        //自定义表单校检
+        form.verify({
+        	  checkBackNum: function(value, item){  //value：表单的值、item：表单的DOM对象
+        		
+        		 // alert(1111);
+        		  //字符串转为数字类型
+        		  var inportNumber= parseInt($("#inport_number").val());
+        	    
+        		  alert(value);
+        		  //如果数值大于原来进货单的数量,或者小于0都不行
+        		  alert(parseInt(value));
+	        	  if(parseInt(value) > inportNumber || parseInt(value) <1){
+	        		  
+	        	      return '数量只能在【0】-【'+ inportNumber +'】之间';
+	        	  }       	 
+        	  }       	
+        });
+    })
+
+</script>
+
+</body>
+</html>
