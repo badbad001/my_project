@@ -21,7 +21,7 @@
         <druid.version>1.1.20</druid.version>
         <log4j.version>1.2.17</log4j.version>
         <mybatis.version>2.1.0</mybatis.version>
-        <shiro.version>1.4.1</shiro.version>
+        <shiro.version>1.7.1</shiro.version>
         <lang3.version>3.9</lang3.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <io.version>2.4</io.version>
