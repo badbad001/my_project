@@ -25,7 +25,7 @@
         <lang3.version>3.9</lang3.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <io.version>2.4</io.version>
-        <fastjson.version>1.2.56</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <quartz.version>2.3.0</quartz.version>
         <activiti5.version>5.22.0</activiti5.version>
         <poi.version>4.0.1</poi.version>
